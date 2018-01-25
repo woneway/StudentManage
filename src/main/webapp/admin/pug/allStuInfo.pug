@@ -1,0 +1,409 @@
+doctype html
+html(lang='en')
+
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='description', content='')
+    meta(name='author', content='')
+
+    title 学生信息管理系统
+
+    include includes/css/core.pug
+
+    // Page level plugin CSS
+    link(href='vendor/datatables/dataTables.bootstrap4.css', rel='stylesheet')
+    link(href='vendor/datetimepicker/css/bootstrap-datetimepicker.min.css', rel='stylesheet')
+
+    include includes/css/custom.pug
+
+  body#page-top.fixed-nav.sticky-footer.bg-dark
+    include includes/navbar.pug
+    .content-wrapper
+      .container-fluid
+        // Breadcrumbs
+        ol.breadcrumb
+          li.breadcrumb-item
+            a(href='#') Dashboard
+          li.breadcrumb-item.active Tables
+        // Example DataTables Card
+        .card.mb-3
+          .card-header
+            i.fa.fa-table
+            |  学生基本信息
+            button#addSInfo.btn.btn-primary 添加学生
+            .btn-group
+             button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown")
+              |专业
+              span.caret     
+              ul.dropdown-menu(role="menu")
+                li#profession_jk.btn.btn-info
+                  | 计算机控制      
+                li#profession_wa.btn.btn-info
+                  | 网络安全       
+                li#profession_jy.btn.btn-info
+                  | 计算机应用
+          .card-body
+            .table-responsive
+              table#showSInfo.table.table-bordered.table-striped(width='100%', cellspacing='0')
+                thead
+                  tr
+                    th 序号
+                    th 学号
+                    th 姓名
+                    th 性别
+                    th 入学日期
+                    th 年龄
+                    th 操作
+                    th 专业
+                    th 总学分
+                tfoot
+                  tr
+                    th 序号
+                    th 学号
+                    th 姓名
+                    th 性别
+                    th 入学日期
+                    th 年龄
+                    th 操作
+                    th 专业
+                    th 总学分
+          .card-footer.small.text-muted
+            | Updated yesterday at 11:59 PM
+      // /.container-fluid
+      // /.content-wrapper
+
+      include includes/footer.pug
+
+      include includes/scroll-to-top.pug
+
+      include includes/modals/logout.pug
+
+      include includes/js/core.pug
+
+      // Page level plugin JavaScript
+      script(src='vendor/datatables/jquery.dataTables.js')
+      script(src='vendor/datatables/dataTables.bootstrap4.js')
+      script(src='vendor/moment/moment.js')
+      script(src='vendor/IDNumToAge/IDNumToAge.js')
+      script(src='vendor/datetimepicker/js/bootstrap-datetimepicker.min.js')
+      script(src='vendor/datetimepicker/js/moment-with-locales.min.js')
+
+      include includes/js/custom.pug
+
+      // Custom scripts for this page
+      script(src='js/sb-admin-datatables.min.js')
+script(type="text/javascript").
+  $(document).ready(function() {
+  // 展示用户信息
+  var table = $('#showSInfo').DataTable( {
+  "ajax": "http://localhost:8080/StudentManage/StuInfo/showStuInfo",
+  "fnDrawCallback" : function(){
+  this.api().column(0).nodes().each(function(cell, i) {
+  cell.innerHTML =  i + 1;
+  });
+  },
+  "columns": [
+  { "data": null},
+  { "data": "stuid" },
+  { "data": "stuname" },
+  { "data": "sex" ,
+  "render": function(data){
+  if(data==1)
+  return "男";
+  else
+  return "女";
+  }
+  },
+  { "data": "date",
+  "render":function(data, type, full, meta) {
+  //时间格式化
+  return  moment(data).format("YYYY-MM-DD");
+  }
+  },
+  { "data": "idnum",
+  "render":function(data){
+  return GetAge(data);
+  }
+  },
+  { "data": "operation"
+  },
+  { "data": "profession",
+    "render": function(data){
+      if(data==1)
+        return "计算机控制";
+      if(data==2)
+        return "网络安全";
+      return "计算机应用"; 
+    }   
+    },
+  { "data": "totalscore"
+  },
+  { "data": "note"
+  }
+  ],
+  "columnDefs": [{
+  "targets": -4,//del
+  "data": null,
+  "defaultContent": "<button id='editSInfo' class='btn btn-primary' type='button'>编辑</button>&nbsp;&nbsp;" +
+  "<button id='delSInfo' class='btn btn-primary' type='button'>删除</button>"
+  },
+   {
+     "targets": -1,
+     "visible": false
+     },
+   {
+     "targets": -2,
+     "visible": false
+     },
+   {
+     "targets": -3,
+     "visible": false
+     }
+  ],
+   "initComplete": function () {
+       var api = this.api();
+       $('#profession_jk').click(function(){ 
+               api.search( this.innerHTML ).draw();
+       });
+        $('#profession_wa').click(function(){ 
+               api.search( this.innerHTML ).draw();
+       });
+        $('#profession_jy').click(function(){ 
+               api.search( this.innerHTML ).draw();
+       });
+   }
+  } );
+  //del data
+  $('#showSInfo tbody').on('click', '#delSInfo', function () {
+  var data = table.row($(this).parents('tr')).data();
+  var stuid = data.stuid;
+  var status = 0;
+  if (confirm("数据将永久删除，你确定要删除吗？")) {
+  $.ajax({
+  url: "http://localhost:8080/StudentManage/StuInfo/delStuInfo?stuid=" + stuid,
+  type: "POST"
+  }).done(function (doc) {
+  if (doc === 1) {
+  table.ajax.reload();
+  }
+  });
+  }
+  });
+
+  //editSInfo
+  $('#showSInfo tbody').on('click', '#editSInfo', function () {
+       var data = table.row($(this).parents('tr')).data();
+       $('#stuid').val(data.stuid);
+       $('#stuname').val(data.stuname);
+       $('#date').val(moment(data.date).format("YYYY-MM-DD"));
+       $('#profession').val(data.profession);
+       $('#sex').val(data.sex);
+       $('#note').val(data.note);
+       $('#idnum').val(data.idnum);
+       $('#editModal').modal('show');
+   });
+
+   //editSInfo submit
+   $('#editSInfoSubmit').click(function () {
+       $.ajax({
+           url: "http://localhost:8080/StudentManage/StuInfo/updateStuInfo",
+           type: "POST",
+           data:{
+           "stuid":$("#stuid").val(),
+           "profession":$("#profession").val()
+           },
+           }).done(function (doc) {
+           if (doc === 1) {
+           table.ajax.reload();
+           }
+         });
+         });
+
+
+    //add modal
+    $('#addSInfo').on('click', function () {
+        $('#editModal1').modal('show');
+        $.ajax({
+        url: "http://localhost:8080/StudentManage/StuInfo/MaxStuInfoId",
+        type: "POST",
+        success:function(data){
+        	$("#stuid1").val(data);
+        }
+        });
+    });
+    //add modal submit
+    $('#addSInfoSubmit').click(function () {
+        $.ajax({
+          url: "http://localhost:8080/StudentManage/StuInfo/addStuInfo",
+          type: "POST",
+          data:{
+          "stuid":$("#stuid1").val(),
+          "stuname":$("#stuname1").val(),
+          "profession":$("#profession1").val(),
+          "date":$("#date1").val(),
+          "sex":$("#sex1").val(),
+          "idnum":$("#idnum1").val(),
+          "totalscore":0,
+          "note":$("#note1").val(),
+          },
+          }).done(function (doc) {
+          if (doc === 1) {
+          table.ajax.reload();
+
+          }
+        });
+    });
+	 
+	 
+    //datetimepicker
+  
+    $('#date').datetimepicker({ 
+    format: "yyyy-mm-dd", 
+    todayBtn: "linked", 
+    locale: 'zh-CN',
+    autoclose:true,
+    minView:2  
+ });
+ $('#date1').datetimepicker({ 
+    format: "yyyy-mm-dd", 
+    todayBtn: "linked", 
+    locale: 'zh-CN',
+    autoclose:true,
+    minView:2  
+ });
+
+
+  } );
+
+
+
+// edit model
+.modal.fade#editModal1(tabindex="-1", role="dialog", aria-labelledby="editLabel")
+  .modal-dialog(role="document")
+    #content.modal-content
+      .modal-header
+        h4  增加学生信息
+        button.close(type="button", data-dismiss="modal", aria-label="Close")
+          span(aria-hidden="true")  &times;
+      #editBody1.modal-body
+        form.form-horizontal(role="form")
+          .form-group
+            label.col-sm-4.control-label 姓名
+            |     
+            .col-sm-10
+              input#stuname1.form-control(type="text", placeholder="请输入姓名")
+          .form-group
+            label.col-sm-4.control-label(for="inputPassword") 学号
+            |     
+            .col-sm-10
+              input#stuid1.form-control(type="text", disabled)
+          |   
+          .form-group
+            label.col-sm-4.control-label 性别
+            |     
+            .col-sm-10
+              select#sex1.form-control
+                option(value="1") 男
+                |       
+                option(value="0") 女
+          |     
+          |   
+          .form-group
+            label.col-sm-4.control-label 专业
+            |     
+            .col-sm-10
+              select#profession1.form-control
+                option(value="1") 计算机控制
+                |       
+                option(value="2") 网络安全
+                |       
+                option(value="3") 计算机应用
+          |   
+          |   
+          .form-group
+            label.col-sm-4.control-label 身份证号
+            |     
+            .col-sm-10
+              input#idnum1.form-control(type="text", placeholder="请输入身份证号")
+          |   
+          form-group
+            label.col-sm-4.control-label 选择日期
+            // 指定 date标记
+            #datetimepicker.col-sm-10
+              input#date1.form-control(type="text",placeholder="请选择入学时间")  
+          .form-group
+            label.col-sm-4.control-label 其他说明
+            |     
+            .col-sm-10
+             textarea#note1.form-control( placeholder="描述自己")
+          .modal-footer
+            button.btn.green(type="button", data-dismiss="modal") 取消
+            | &nbsp;  &nbsp;               
+            button#addSInfoSubmit.btn.btn-primary(type="submit") 确定
+
+
+// edit model
+.modal.fade#editModal(tabindex="-1", role="dialog", aria-labelledby="editLabel")
+  .modal-dialog(role="document")
+    #content.modal-content
+      .modal-header
+        h4  修改学生信息
+        button.close(type="button", data-dismiss="modal", aria-label="Close")
+          span(aria-hidden="true")  &times;
+      #editBody.modal-body
+        form.form-horizontal(role="form")
+          .form-group
+            label.col-sm-4.control-label 姓名
+            |     
+            .col-sm-10
+              input#stuname.form-control(type="text", disabled)
+          .form-group
+            label.col-sm-4.control-label(for="inputPassword") 学号
+            |     
+            .col-sm-10
+              input#stuid.form-control(type="text", disabled)
+          |   
+          .form-group
+            label.col-sm-4.control-label 性别
+            |     
+            .col-sm-10
+              select#sex.form-control(disabled)
+                option(value="1") 男
+                |       
+                option(value="0") 女
+          |     
+          |   
+          .form-group
+            label.col-sm-4.control-label 专业
+            |     
+            .col-sm-10
+              select#profession.form-control
+                option(value="1") 计算机控制
+                |       
+                option(value="2") 网络安全
+                |       
+                option(value="3") 计算机应用
+          |   
+          |   
+          .form-group
+            label.col-sm-4.control-label 身份证号
+            |     
+            .col-sm-10
+              input#idnum.form-control(type="text", disabled)
+          |   
+          form-group
+            label.col-sm-4.control-label 选择日期
+            // 指定 date标记
+            #datetimepicker.col-sm-10
+              input#date.form-control(type="text",disabled)  
+          .form-group
+            label.col-sm-4.control-label 其他说明
+            |     
+            .col-sm-10
+             textarea#note.form-control( disabled)
+          .modal-footer
+            button.btn.green(type="button", data-dismiss="modal") 取消
+            | &nbsp;  &nbsp;               
+            button#editSInfoSubmit.btn.btn-primary(type="submit") 确定

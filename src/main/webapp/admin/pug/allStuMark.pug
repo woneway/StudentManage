@@ -1,0 +1,272 @@
+doctype html
+html(lang='en')
+
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='description', content='')
+    meta(name='author', content='')
+
+    title 学生信息管理系统
+
+    include includes/css/core.pug
+
+    // Page level plugin CSS
+    link(href='vendor/datatables/dataTables.bootstrap4.css', rel='stylesheet')
+    link(href='vendor/datetimepicker/css/bootstrap-datetimepicker.min.css', rel='stylesheet')
+
+    include includes/css/custom.pug
+
+  body#page-top.fixed-nav.sticky-footer.bg-dark
+    include includes/navbar.pug
+    .content-wrapper
+      .container-fluid
+        // Breadcrumbs
+        ol.breadcrumb
+          li.breadcrumb-item
+            a(href='#') Dashboard
+          li.breadcrumb-item.active Tables
+        // Example DataTables Card
+        .card.mb-3
+          .card-header
+            i.fa.fa-table
+            |  学生成绩统计
+            button#addSMark.btn.btn-primary 添加成绩
+          .card-body
+            .table-responsive
+              table#showSMark.table.table-bordered.table-striped(width='100%', cellspacing='0')
+                thead
+                  tr
+                    th 序号
+                    th 姓名
+                    th 课程名称
+                    th 平时成绩
+                    th 考核成绩
+                    th 最终成绩
+                    th 其他说明
+                    th 学号
+                    th 操作
+                    th 成绩编号
+                tfoot
+                  tr
+                    th 序号
+                    th 姓名
+                    th 课程名称
+                    th 平时成绩
+                    th 考核成绩
+                    th 最终成绩
+                    th 其他说明
+                    th 学号
+                    th 操作
+                    th 成绩编号
+          .card-footer.small.text-muted
+            | Updated yesterday at 11:59 PM
+      // /.container-fluid
+      // /.content-wrapper
+
+      include includes/footer.pug
+
+      include includes/scroll-to-top.pug
+
+      include includes/modals/logout.pug
+
+      include includes/js/core.pug
+
+      // Page level plugin JavaScript
+      script(src='vendor/datatables/jquery.dataTables.js')
+      script(src='vendor/datatables/dataTables.bootstrap4.js')
+      script(src='vendor/moment/moment.js')
+      script(src='vendor/IDNumToAge/IDNumToAge.js')
+      script(src='vendor/datetimepicker/js/bootstrap-datetimepicker.min.js')
+      script(src='vendor/datetimepicker/js/moment-with-locales.min.js')
+
+      include includes/js/custom.pug
+
+      // Custom scripts for this page
+      script(src='js/sb-admin-datatables.min.js')
+script(type="text/javascript").
+
+    //自动计算最后成绩
+    function calFinalScore(id)
+    {
+      $(id).change(function(){
+            var basescore = $('#basescore').val();
+            var testscore = $('#testscore').val();
+            if(!isNaN(basescore) && !isNaN(testscore)){
+                var amount = basescore * 0.3 + testscore * 0.7;
+                $("#finalscore").val(amount.toFixed(2));  
+            }else{
+                $("#finalscore").val("");
+            }
+          });
+    }
+    $(function () {
+      calFinalScore('#basescore');
+      calFinalScore('#testscore');
+    })
+
+
+  $(document).ready(function() {
+        // 展示学生成绩
+        var table = $('#showSMark').DataTable( {
+          "ajax": "http://localhost:8080/StudentManage/StuMark/showStuMark",
+          "fnDrawCallback" : function(){
+                this.api().column(0).nodes().each(function(cell, i) {
+                    cell.innerHTML =  i + 1;
+                });
+          },
+          "columns": [
+              { "data": null},
+              { "data": "stuname" },
+              { "data": "coursename" },
+              { "data": "basescore" },
+              { "data": "testscore" },
+              { "data": "finalscore"},
+              { "data": "note"},
+              { "data": "stuid"},
+              { "data": "operation"},
+              { "data": "markid"}
+          ],
+          "columnDefs": [{
+              "targets": -2,//del
+              "data": null,
+              "defaultContent": "<button id='delSMark' class='btn btn-primary' type='button'>删除</button>"
+              },
+              {
+              "targets": -3,//stuid
+              "visible":false
+              },
+              {
+              "targets": -1,//markid
+              "visible":false
+              }
+              ]
+        });
+
+         //del data
+  $('#showSMark tbody').on('click', '#delSMark', function () {
+      var data = table.row($(this).parents('tr')).data();
+      var markid = data.markid;
+      var stuid = data.stuid;
+      var status = 0;
+      if (confirm("数据将永久删除，你确定要删除吗？")) {
+      $.ajax({
+          url: "http://localhost:8080/StudentManage/StuMark/delStuMark?markid=" + markid+"&stuid="+stuid,
+          type: "POST"
+          }).done(function (doc) {
+                if (doc === 1) {
+                    table.ajax.reload();
+                    }
+                  });
+      }
+  });
+
+      //add modal
+    $('#addSMark').on('click', function () {
+        $('#editModal').modal('show');
+        $.ajax({
+          url: "http://localhost:8080/StudentManage/StuMark/MaxStuMarkId",
+          type: "POST",
+          dataType:"json",
+          success:function(data){
+            $('#markid').val(data.markid);
+            var stuidname = data.stuidname;
+            var courselist = data.courselist;
+            var options_s = "";
+            var options_c = "";
+            for(var i in stuidname)
+            {
+              var stu = stuidname[i];
+              options_s += 
+              "<option value='"+stu.stuid+"')>"+stu.stuname+"</option>";
+            }
+            $("#stulist").html(options_s);
+            for(var i in courselist)
+            {
+              var cou = courselist[i];
+              options_c += 
+              "<option value='"+cou.coursename+"')>"+cou.coursename+"</option>";
+            }
+            $("#courselist").html(options_c);
+          }
+        });
+    });
+    //add modal submit
+    $('#addSMarkSubmit').click(function () {
+        $.ajax({
+          url: "http://localhost:8080/StudentManage/StuMark/addStuMark",
+          type: "POST",
+          data:{
+            "stuid":$("#stulist").val(),
+            "coursename":$("#courselist").val(),
+            "markid":$("#markid").val(),
+            "basescore":$("#basescore").val(),
+            "testscore":$("#testscore").val(),
+            "finalscore":$("#finalscore").val(),
+            "note":$("#note").val(),
+            "adddate":moment(new Date()).format("YYYY-MM-DD")
+          },
+          }).done(function (doc) {
+          if (doc === 1) {
+          table.ajax.reload();
+          }
+        });
+    });
+
+  });
+
+
+
+// edit model
+.modal.fade#editModal(tabindex="-1", role="dialog", aria-labelledby="editLabel")
+  .modal-dialog(role="document")
+    #content.modal-content
+      .modal-header
+        h4  增加成绩记录
+        button.close(type="button", data-dismiss="modal", aria-label="Close")
+          span(aria-hidden="true")  &times;
+      #editBody.modal-body
+        form.form-horizontal(role="form")
+          .form-group
+            label.col-sm-4.control-label 课程选择
+            |     
+            .col-sm-10
+              select#courselist.form-control
+          .form-group
+            label.col-sm-4.control-label 成绩编号
+            |     
+            .col-sm-10
+              input#markid.form-control(type="text", disabled)
+          .form-group
+            label.col-sm-4.control-label 学生选择
+            |     
+            .col-sm-10
+              select#stulist.form-control
+          .form-group
+            label.col-sm-4.control-label 平时成绩
+            |     
+            .col-sm-10
+              input#basescore.form-control(type="text", placeholder="请输入平时成绩")
+          |   
+          .form-group
+            label.col-sm-4.control-label 考核成绩
+            |     
+            .col-sm-10
+              input#testscore.form-control(type="text", placeholder="请输入考核成绩")
+          |   
+          .form-group
+            label.col-sm-4.control-label 最终成绩
+            |     
+            .col-sm-10
+              input#finalscore.form-control(type="text", placeholder="请输入最终成绩" disabled)
+          |   
+          .form-group
+            label.col-sm-4.control-label 其他说明
+            |     
+            .col-sm-10
+             textarea#note.form-control( placeholder="其他说明")
+          .modal-footer
+            button.btn.green(type="button", data-dismiss="modal") 取消
+            | &nbsp;  &nbsp;               
+            button#addSMarkSubmit.btn.btn-primary(type="submit") 确定

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.StuMng.mapping.StudentInfoMapper">
+	<resultMap id="BaseResultMap" type="com.StuMng.po.StudentInfo">
+		<id column="StuID" property="stuid" jdbcType="VARCHAR" />
+		<result column="StuName" property="stuname" jdbcType="VARCHAR" />
+		<result column="Profession" property="profession" jdbcType="NUMERIC" />
+		<result column="Date" property="date" jdbcType="DATE" />
+		<result column="Sex" property="sex" jdbcType="NUMERIC" />
+		<result column="IDNum" property="idnum" jdbcType="VARCHAR" />
+		<result column="TotalScore" property="totalscore" jdbcType="NUMERIC" />
+		<result column="Note" property="note" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		StuID, StuName, Profession, Date, Sex, IDNum, TotalScore, Note
+	</sql>
+
+
+	<!-- 显示所有学生信息 -->
+	<select id="showStuInfo" resultMap="BaseResultMap">
+		select * from StudentInfo;
+	</select>
+	
+	<!-- 删除一条学生信息  -->
+	<delete id="delStuInfo" parameterType="String">
+		delete from StudentInfo where stuid=#{stuid};
+	</delete>
+	
+	<!-- 增加一条学生信息 -->
+	<insert id="addStuInfo" parameterType="com.StuMng.po.StudentInfo">
+		insert into StudentInfo (StuID, StuName, Profession, Date, Sex, IDNum, TotalScore, Note) 
+		values(
+			#{stuid},
+			#{stuname},
+			#{profession},
+			#{date},
+			#{sex},
+			#{idnum},
+			#{totalscore},
+			#{note}
+		);
+	</insert>
+	
+	<!-- 找出最大的学号 -->
+	<select id="MaxStuInfoId" resultType="String">
+		SELECT max(StuID) FROM StudentInfo;
+	</select>
+	
+	<update id="updateStuInfo" parameterType="com.StuMng.po.StudentInfo">
+		UPDATE studentinfo SET 
+		Profession = #{profession}
+		WHERE StuID =#{stuid};
+	</update>
+	
+	<update id="updateTotalScore" parameterType="java.util.Map">
+		UPDATE studentinfo SET 
+		totalscore = #{totalscore}
+		WHERE StuID =#{stuid};
+	</update>
+</mapper>

@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "stuid": "Tiger Nixon222",
+      "stuname": "System Architect",
+      "profession": "$320,800",
+      "date": "2011/04/25",
+      "sex": "Edinburgh",
+      "idnum": "5421",
+      "totalscore": "Edinburgh",
+      "note": "Edinburgh"
+    },
+    {
+      "stuid": "Tiger Nixon222",
+      "stuname": "System Architect",
+      "profession": "$320,800",
+      "date": "2011/04/25",
+      "sex": "Edinburgh",
+      "idnum": "5421",
+      "totalscore": "Edinburgh",
+      "note": "Edinburgh"
+    }
+  ]
+}

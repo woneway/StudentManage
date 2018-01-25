@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.StuMng.mapping.StuMarkInfoMapper">
+	<resultMap id="BaseResultMap_Mark" type="com.StuMng.po.StuMarkInfo">
+		<id column="Markid" property="markid" jdbcType="VARCHAR" />
+		<result column="StuID" property="stuid" jdbcType="VARCHAR" />
+		<result column="CourseName" property="coursename" jdbcType="VARCHAR" />
+		<result column="BaseScore" property="basescore" jdbcType="NUMERIC" />
+		<result column="TestScore" property="testscore" jdbcType="NUMERIC" />
+		<result column="FinalScore" property="finalscore" jdbcType="NUMERIC" />
+		<result column="AddDate" property="adddate" jdbcType="DATE" />
+		<result column="Note" property="note" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List_Mark">
+		Markid, StuID, CourseName, BaseScore, TestScore, FinalScore, AddDate, Note
+	</sql>
+
+	<!-- 显示所有学生成绩 -->
+	<select id="showStuMark" resultType="com.StuMng.po.StudentMark">
+		select * from stu_mark;
+	</select>
+	
+	<!-- 删除学生成绩  -->
+	<delete id="delStuMark" parameterType="String">
+		delete from stumarkinfo  where markid = #{markid};
+	</delete>
+	
+	
+	<!-- 找出最大的成绩编号 -->
+	<select id="MaxStuMarkId" resultType="String">
+		SELECT max(markid) FROM stumarkinfo;
+	</select>
+	<!-- 返回所有学生姓名和学号 -->
+	<select id="StuIdName" resultType="com.StuMng.po.Stu_Id_Name">
+		SELECT * FROM stu_id_name;
+	</select>
+	<!-- 返回所有课程名称 -->
+	<select id="CourseList" resultType="com.StuMng.po.StudentMark">
+		SELECT distinct CourseName  FROM stumarkinfo;
+	</select>
+	<!-- 返回学号总学分 -->
+	<select id="getTotalScore" resultType="java.lang.Integer" parameterType="String">
+		SELECT totalscore  FROM stu_id_totalscore where stuid = #{stuid};
+	</select>
+	
+		
+	<!-- 增加一条成绩记录  -->
+	<insert id="addStuMark" parameterType="com.StuMng.po.StuMarkInfo">
+		INSERT INTO stumarkinfo 
+		(Markid, StuID, CourseName, BaseScore, TestScore, FinalScore, AddDate, Note) 
+		values(
+			#{markid},
+			#{stuid},
+			#{coursename},
+			#{basescore},
+			#{testscore},
+			#{finalscore},
+			#{adddate},
+			#{note}
+		);
+	</insert>
+	
+</mapper>
