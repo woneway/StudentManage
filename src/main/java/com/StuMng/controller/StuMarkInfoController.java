@@ -21,10 +21,6 @@ import com.alibaba.fastjson.JSON;
 @RequestMapping("/StuMark")
 public class StuMarkInfoController {
 	
-	public StuMarkInfoController() {
-		System.out.println("学生成绩管理 controller...");
-	}
-	
 	@Autowired
 	private IStuMarkInfoService stuMarkInfoService;
 	
@@ -33,7 +29,6 @@ public class StuMarkInfoController {
 
 	@RequestMapping("/showStuMark")	
 	public @ResponseBody JsonData showStuMark() {
-        System.out.println("学生成绩管理---展示所有学生成绩");
         List<StudentMark> studentMark = stuMarkInfoService.showStuMark();  
 		JsonData jsonData = new JsonData();
 		jsonData.setData(studentMark);
@@ -45,18 +40,13 @@ public class StuMarkInfoController {
 	@RequestMapping("/delStuMark")
 	@ResponseBody
 	public Integer delStuMark(String markid,String stuid) {
-		System.out.println("学生成绩管理---删除学生成绩");
-		
 		int f = stuMarkInfoService.delStuMark(markid);
 		Double finalscore = stuMarkInfoService.getFinalScore(markid)*0.1;
 		if(f != 1) return f;
-		System.out.println(stuid);
 		Map map = new HashMap();
 		map.put("stuid", stuid);
-		System.out.println(map);
 		int totalscore = stuMarkInfoService.getTotalScore(stuid);
 		map.put("totalscore", totalscore-Math.round(finalscore));
-		System.out.println(map);
 		stuInfoService.updateTotalScore(map);
 		return f;
 	}
@@ -66,7 +56,6 @@ public class StuMarkInfoController {
 	@RequestMapping("/MaxStuMarkId")
 	@ResponseBody
 	public Map MaxStuMarkId() {
-		System.out.println("学生成绩管理---获得成绩编号最大值");
 		String markid = stuMarkInfoService.MaxStuMarkId();
 		if(markid==null)
 			markid = "CJ2015060000";
@@ -86,20 +75,15 @@ public class StuMarkInfoController {
 	@RequestMapping("/addStuMark")
 	@ResponseBody
 	public Integer addStuMark(StuMarkInfo stuMarkInfo) {
-		System.out.println("学生成绩管理---增加学生成绩");
-		System.out.println(JSON.toJSON(stuMarkInfo));
 		double finalscore = stuMarkInfo.getFinalscore()*0.1;
 		int f = stuMarkInfoService.addStuMark(stuMarkInfo);
 		if(f != 1) return f;
 		//更新总学分;
 		String stuid = stuMarkInfo.getStuid();
-		System.out.println(stuid);
 		Map map = new HashMap();
 		map.put("stuid", stuid);
-		System.out.println(map);
 		int totalscore = stuMarkInfoService.getTotalScore(stuid);
 		map.put("totalscore", totalscore+Math.round(finalscore));
-		System.out.println(map);
 		stuInfoService.updateTotalScore(map);
 		return f;
 	}

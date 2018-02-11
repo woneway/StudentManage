@@ -18,10 +18,6 @@ public class StuMarkServiceImpl implements IStuMarkInfoService {
 	@Autowired
 	private StuMarkInfoMapper stuMarkInfoMapper;
 	
-	public StuMarkServiceImpl() {
-        System.out.println("学生成绩管理  serviceimpl...");
-    }
-	
 	@Override
 	public List<StudentMark> showStuMark() {
 		// TODO Auto-generated method stub

@@ -15,10 +15,6 @@ public class StuInfoServiceImpl implements IStuInfoService{
 	@Autowired
 	private StudentInfoMapper studentInfoMapper;
 	
-	public StuInfoServiceImpl() {
-        System.out.println("学生信息管理 serviceimpl...");
-    }
-	
 	@Override
 	public List<StudentInfo> showStuInfo() {
 		// TODO Auto-generated method stub
