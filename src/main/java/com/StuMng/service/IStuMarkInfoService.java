@@ -15,4 +15,5 @@ public interface IStuMarkInfoService {
 	public List<StudentMark> CourseList();
 	public Integer addStuMark(StuMarkInfo stuMarkInfo);
 	public Integer getTotalScore(String stuid);
+	public Double getFinalScore(String markid);
 }

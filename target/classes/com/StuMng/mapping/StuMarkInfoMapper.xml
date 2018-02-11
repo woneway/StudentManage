@@ -37,13 +37,16 @@
 	</select>
 	<!-- 返回所有课程名称 -->
 	<select id="CourseList" resultType="com.StuMng.po.StudentMark">
-		SELECT distinct CourseName  FROM stumarkinfo;
+		SELECT distinct CourseName  FROM course;
 	</select>
 	<!-- 返回学号总学分 -->
 	<select id="getTotalScore" resultType="java.lang.Integer" parameterType="String">
 		SELECT totalscore  FROM stu_id_totalscore where stuid = #{stuid};
 	</select>
-	
+	<!-- 返回该条成绩记录的finalscore -->
+	<select id="getFinalScore" resultType="java.lang.Integer" parameterType="String">
+		SELECT finalscore  FROM stumarkinfo where markid = #{markid};
+	</select>
 		
 	<!-- 增加一条成绩记录  -->
 	<insert id="addStuMark" parameterType="com.StuMng.po.StuMarkInfo">

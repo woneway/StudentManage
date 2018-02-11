@@ -1,7 +1,5 @@
 package com.StuMng.po;
 
-import java.math.BigDecimal;
-
 public class StudentMark{
 	
 	private String markid;
@@ -10,11 +8,11 @@ public class StudentMark{
 	
 	private String coursename;
 	
-    private BigDecimal basescore;
+    private Double basescore;
 
-    private BigDecimal testscore;
+    private Double testscore;
 
-    private BigDecimal finalscore;
+    private Double finalscore;
 
     private String note;
     
@@ -36,27 +34,27 @@ public class StudentMark{
 		this.coursename = coursename;
 	}
 
-	public BigDecimal getBasescore() {
+	public Double getBasescore() {
 		return basescore;
 	}
 
-	public void setBasescore(BigDecimal basescore) {
+	public void setBasescore(Double basescore) {
 		this.basescore = basescore;
 	}
 
-	public BigDecimal getTestscore() {
+	public Double getTestscore() {
 		return testscore;
 	}
 
-	public void setTestscore(BigDecimal testscore) {
+	public void setTestscore(Double testscore) {
 		this.testscore = testscore;
 	}
 
-	public BigDecimal getFinalscore() {
+	public Double getFinalscore() {
 		return finalscore;
 	}
 
-	public void setFinalscore(BigDecimal finalscore) {
+	public void setFinalscore(Double finalscore) {
 		this.finalscore = finalscore;
 	}
 

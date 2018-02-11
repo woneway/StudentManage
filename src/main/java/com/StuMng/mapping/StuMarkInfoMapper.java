@@ -24,4 +24,6 @@ public interface StuMarkInfoMapper {
 	
 	Integer getTotalScore(String stuid);
 	
+	Double getFinalScore(String markid);
+	
 }

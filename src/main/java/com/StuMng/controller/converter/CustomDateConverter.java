@@ -6,15 +6,6 @@ import java.util.Date;
 
 import org.springframework.core.convert.converter.Converter;
 
-/**
- * 
-* @Title: CustomDateConverter.java 
-* @Package com.woneway.controller.converter 
-* @Description: 日期转换�?
-* @author Woneway
-* @date Oct 1, 2017 2:44:56 PM 
-* @version V1.0
- */
 public class CustomDateConverter implements Converter<String,Date>{
 
 	@Override

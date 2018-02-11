@@ -64,4 +64,10 @@ public class StuMarkServiceImpl implements IStuMarkInfoService {
 		return stuMarkInfoMapper.getTotalScore(stuid);
 	}
 
+	@Override
+	public Double getFinalScore(String markid) {
+		// TODO Auto-generated method stub
+		return stuMarkInfoMapper.getFinalScore(markid);
+	}
+
 }
